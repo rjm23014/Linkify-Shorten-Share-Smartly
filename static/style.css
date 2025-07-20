@@ -1,33 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    background: #111;
-    color: #eee;
-    font-family: 'Segoe UI', sans-serif;
-    text-align: center;
-    padding-top: 50px;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
 .container {
-    background: #222;
-    padding: 30px;
-    border-radius: 10px;
-    width: 60%;
-    margin: auto;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+h1, h2, h3 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #f4f4f4;
 }
 
 input[type="url"] {
-    width: 80%;
-    padding: 10px;
-    margin-bottom: 10px;
+    width: 100%;
+    padding: 14px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    transition: 0.3s ease;
+}
+
+input[type="url"]:focus {
+    outline: none;
+    background: rgba(255,255,255,0.2);
 }
 
 button {
-    padding: 10px 20px;
-    background: #0f62fe;
+    padding: 12px 30px;
+    background: #1e90ff;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 4px 14px rgba(30,144,255,0.4);
+}
+
+button:hover {
+    background: #1c86ee;
+    box-shadow: 0 6px 20px rgba(30,144,255,0.6);
+}
+
+a {
+    color: #1e90ff;
+    text-decoration: none;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    max-width: 70%;
+}
+
+p {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #ddd;
 }
