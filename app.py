@@ -3,6 +3,11 @@ from shortener import shorten_url
 from qr_generator import generate_qr
 from db import init_db, get_long_url, increment_visit, get_visits
 import os
+from flask import request
+from time import time
+rate_limit = {}
+RATE_WINDOW = 60  # seconds
+
 
 app = Flask(__name__)
 init_db()
@@ -17,6 +22,13 @@ def index():
         visits = get_visits(short_code)
         return render_template('result.html', short_url=short_url, qr_image=qr_code_path, visits=visits)
     return render_template('index.html')
+    ip = request.remote_addr
+    now = time()
+    if ip in rate_limit and now - rate_limit[ip] < RATE_WINDOW:
+        return "<h1>⛔ Too many requests. Try again in a minute.</h1>"
+    rate_limit[ip] = now
+    ...
+
 
 @app.route('/<short_code>')
 def redirect_to_long(short_code):
