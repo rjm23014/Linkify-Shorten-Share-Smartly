@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shortened!</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Your Short URL:</h2>
+        <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+        <h3>QR Code:</h3>
+        <img src="/{{ qr_image }}" alt="QR Code">
+        <br>
+        <a href="/">🔙 Shorten another</a>
+    </div>
+</body>
+</html>

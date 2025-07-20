@@ -1,0 +1,33 @@
+body {
+    background: #111;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    padding-top: 50px;
+}
+
+.container {
+    background: #222;
+    padding: 30px;
+    border-radius: 10px;
+    width: 60%;
+    margin: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+input[type="url"] {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    background: #0f62fe;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
