@@ -21,7 +21,7 @@ FREE_LINKS_FOR_USERS = 10  # Free links for registered users
 PAID_LINKS_PACKAGE = 10  # Links in paid package
 PAID_PACKAGE_PRICE = 50  # INR 50 for 10 links
 
-BASE_URL = "http://localhost:5001"
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:5001')
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -285,4 +285,6 @@ def dashboard():
 
 if __name__ == "__main__":
     init_db()  # initialize the database
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get('PORT', 5001))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    app.run(debug=debug, host='0.0.0.0', port=port)
