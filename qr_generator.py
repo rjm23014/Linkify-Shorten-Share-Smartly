@@ -3,6 +3,7 @@ import os
 
 def generate_qr(data):
     img = qrcode.make(data)
-    path = f'static/qr_{hash(data)}.png'
+    filename = f'qr_{hash(data)}.png'
+    path = os.path.join('static', filename)
     img.save(path)
-    return path
+    return f'static/{filename}'

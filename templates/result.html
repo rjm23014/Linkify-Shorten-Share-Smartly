@@ -12,6 +12,8 @@
     <div class="container">
         <h2>Your Short URL:</h2>
         <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+        <a onclick="navigator.clipboard.writeText('{{ short_url }}'); alert('Copied!')">📋 Copy Link</a>
+
         <h3>QR Code:</h3>
         <img src="/{{ qr_image }}" alt="QR Code" width="200">
         <p>📊 Total Visits: <strong>{{ visits }}</strong></p>
