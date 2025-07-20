@@ -1,6 +1,9 @@
 <nav class="navbar">
     <div class="nav-container">
-        <a href="{{ url_for('index') }}" class="nav-logo">🔗 Linkify</a>
+        <a href="{{ url_for('index') }}" class="nav-logo">
+            <img src="/static/logo.png" alt="Linkify Logo" class="logo-image">
+            Linkify
+        </a>
         
         <div class="nav-menu">
             {% if current_user.is_authenticated %}

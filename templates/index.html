@@ -14,9 +14,37 @@
     
     <main class="main-content">
         <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             <h1>🔗 Linkify</h1>
             <p>Transform long URLs into elegant short links that are easy to share and remember.</p>
             
+            {% if not current_user.is_authenticated %}
+                <div class="guest-usage-info">
+                    {% if show_limit_reached %}
+                        <div class="usage-alert usage-alert-danger">
+                            <strong>⚠️ Usage Limit Reached!</strong>
+                            <p>You've reached the daily limit of {{ 3 }} free URL shortenings. Sign in with Google for unlimited access!</p>
+                            <a href="{{ url_for('login') }}" class="btn btn-primary">Sign In Now</a>
+                        </div>
+                    {% else %}
+                        <div class="usage-alert usage-alert-info">
+                            <strong>Guest Mode:</strong> You have <strong>{{ remaining_usage }}</strong> URL shortening{{ 's' if remaining_usage != 1 else '' }} remaining today.
+                            <a href="{{ url_for('login') }}" class="sign-in-link">Sign in for unlimited access</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            {% if not show_limit_reached %}
             <form method="POST" class="url-form">
                 <div class="form-group">
                     <input type="url" 
@@ -31,6 +59,7 @@
                     Shorten & Generate QR
                 </button>
             </form>
+            {% endif %}
             
             <div class="features-preview">
                 <div class="feature">
