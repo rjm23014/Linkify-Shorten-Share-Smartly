@@ -220,7 +220,6 @@ body::before {
     align-items: center;
     justify-content: center;
     padding: 100px 2rem 2rem;
-    min-height: 100vh;
 }
 
 .container {
@@ -1305,12 +1304,69 @@ input:focus {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
+/* Footer Styles */
+.footer {
+    margin-top: auto;
+    padding: 2rem 0;
+    text-align: center;
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    border-top: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    opacity: 0.5;
+}
+
+.footer p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    position: relative;
+    z-index: 1;
+}
+
+.footer p::before {
+    content: '✨';
+    margin-right: 0.5rem;
+    opacity: 0.7;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.footer p::after {
+    content: '✨';
+    margin-left: 0.5rem;
+    opacity: 0.7;
+    animation: sparkle 2s ease-in-out infinite 1s;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+main,
+.main-content {
+    flex: 1;
+}
+
 /* Print styles */
 @media print {
     .navbar,
     .nav-menu,
     .btn,
-    .url-actions {
+    .url-actions,
+    .footer {
         display: none !important;
     }
     
