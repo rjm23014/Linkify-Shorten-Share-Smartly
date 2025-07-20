@@ -20,21 +20,53 @@
             
             <div class="dashboard-stats">
                 <div class="stat-card">
+                    <div class="stat-label">Links Remaining</div>
+                    <div class="stat-number">{{ urls_remaining }}</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-label">Total URLs</div>
-                    <div class="stat-number">{{ urls|length }}</div>
+                    <div class="stat-number">{{ user_urls|length }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Total Visits</div>
-                    <div class="stat-number">{{ urls|sum(attribute=3) or 0 }}</div>
+                    <div class="stat-number">{{ user_urls|sum(attribute=4) or 0 }}</div>
+                </div>
+            </div>
+
+            <!-- Purchase More Links Section -->
+            {% if urls_remaining <= 2 %}
+            <div class="alert-section">
+                <div class="alert alert-warning">
+                    <h3>⚠️ Running Low on Links</h3>
+                    <p>You have {{ urls_remaining }} links remaining. Get 10 more links for just ₹50!</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="purchase-section">
+                <div class="purchase-card">
+                    <h2>🚀 Get More Links</h2>
+                    <div class="price-display">
+                        <span class="currency">₹</span>
+                        <span class="amount">50</span>
+                        <span class="period">for 10 links</span>
+                    </div>
+                    <ul class="features">
+                        <li>✅ 10 additional shortened links</li>
+                        <li>✅ QR code generation</li>
+                        <li>✅ Click tracking</li>
+                        <li>✅ No expiration</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="buyLinks()">Purchase Now</button>
                 </div>
             </div>
 
             <div class="urls-section">
                 <h2 class="section-title">Your Shortened URLs</h2>
                 
-                {% if urls %}
+                {% if user_urls %}
                     <div class="urls-grid">
-                        {% for url in urls %}
+                        {% for url in user_urls %}
                         <div class="url-card">
                             <div class="url-title">
                                 {{ url[1][:80] }}{% if url[1]|length > 80 %}...{% endif %}
@@ -47,8 +79,8 @@
                             </div>
                             
                             <div class="url-meta">
-                                <span>📊 {{ url[3] }} visits</span>
-                                <span>📅 {{ url[5] if url[5] else 'Unknown date' }}</span>
+                                <span>📊 {{ url[4] }} visits</span>
+                                <span>📅 {{ url[3][:10] if url[3] else 'Unknown date' }}</span>
                             </div>
                             
                             <div class="url-actions">
@@ -95,6 +127,29 @@
                 console.error('Could not copy text: ', err);
                 alert('Failed to copy. Please select and copy manually.');
             });
+        }
+
+        function buyLinks() {
+            if (confirm('Purchase 10 additional links for ₹50?\n\nNote: This is a demo - no actual payment will be processed.')) {
+                fetch('/buy-links', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('Error processing payment: ' + error.message);
+                });
+            }
         }
     </script>
 </body>

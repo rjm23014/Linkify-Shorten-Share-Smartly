@@ -15,7 +15,7 @@
     <main class="main-content">
         <div class="container login-container">
             <div class="login-header">
-                <h1>🔐 Welcome to Linkify</h1>
+                <h1> 🖇️Welcome to Linkify</h1>
                 <p class="login-subtitle">Sign in to track your shortened URLs, view analytics, and access premium features.</p>
             </div>
             
@@ -32,6 +32,30 @@
                      data-shape="pill"
                      data-logo_alignment="left">
                 </div>
+                
+                <!-- OAuth Configuration Notice - Collapsible -->
+                <details class="oauth-notice">
+                    <summary>⚠️ OAuth Setup Required (Click to expand)</summary>
+                    <div class="oauth-content">
+                        <p>To enable Google Sign-In, configure these settings in Google Cloud Console:</p>
+                        <ul style="text-align: left; margin: 0.5rem 0;">
+                            <li><strong>Authorized JavaScript origins:</strong> <code>http://localhost:5001</code></li>
+                            <li><strong>Authorized redirect URIs:</strong> <code>http://localhost:5001/auth/google</code></li>
+                        </ul>
+                        <p><a href="https://console.cloud.google.com/apis/credentials" target="_blank">→ Open Google Cloud Console</a></p>
+                    </div>
+                </details>
+            </div>
+            
+            <div class="divider">or</div>
+            
+            <div class="test-login-section">
+                <h3>🧪 Test Mode</h3>
+                <p>For development/testing purposes</p>
+                <a href="{{ url_for('test_login') }}" class="btn btn-primary">
+                    <span>🔧</span>
+                    Sign In as Test User
+                </a>
             </div>
             
             <div class="divider">or</div>

@@ -15,6 +15,7 @@ def init_db():
             email TEXT NOT NULL,
             name TEXT NOT NULL,
             picture TEXT,
+            urls_remaining INTEGER DEFAULT 10,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -83,8 +84,8 @@ def save_to_db(long_url, short_code, user_id=None):
 def create_user(google_id, email, name, picture):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO users (google_id, email, name, picture) VALUES (?, ?, ?, ?)', 
-                   (google_id, email, name, picture))
+    cursor.execute('INSERT INTO users (google_id, email, name, picture, urls_remaining) VALUES (?, ?, ?, ?, ?)', 
+                   (google_id, email, name, picture, 10))  # 10 free links
     conn.commit()
     user_id = cursor.lastrowid
     conn.close()
@@ -113,3 +114,37 @@ def get_user_by_id(user_id):
     result = cursor.fetchone()
     conn.close()
     return result
+
+def update_user_urls_remaining(user_id, remaining):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET urls_remaining = ? WHERE id = ?', (remaining, user_id))
+    conn.commit()
+    conn.close()
+
+def add_paid_links(user_id):
+    """Add 10 more links for ₹50 payment"""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET urls_remaining = urls_remaining + 10 WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+
+def get_user_link_count(user_id):
+    """Get remaining links for a user"""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT urls_remaining FROM users WHERE id = ?', (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else 0
+
+def decrease_user_links(user_id):
+    """Decrease user's remaining links by 1"""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE users SET urls_remaining = urls_remaining - 1 WHERE id = ? AND urls_remaining > 0', (user_id,))
+    conn.commit()
+    rows_affected = cursor.rowcount
+    conn.close()
+    return rows_affected > 0

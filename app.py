@@ -7,7 +7,7 @@ import json
 
 from shortener import shorten_url
 from qr_generator import generate_qr
-from db import init_db, get_long_url, increment_visit, get_visits, save_to_db, create_user, get_user_by_google_id, get_user_urls
+from db import init_db, get_long_url, increment_visit, get_visits, save_to_db, create_user, get_user_by_google_id, get_user_urls, get_user_link_count, decrease_user_links, add_paid_links, get_user_by_id, update_user_urls_remaining
 from user import User
 from config import Config
 import os
@@ -17,6 +17,9 @@ rate_limit = {}
 RATE_WINDOW = 60  # seconds
 GUEST_USAGE_LIMIT = 3  # Maximum uses for guest users
 GUEST_USAGE_WINDOW = 24 * 60 * 60  # 24 hours in seconds
+FREE_LINKS_FOR_USERS = 10  # Free links for registered users
+PAID_LINKS_PACKAGE = 10  # Links in paid package
+PAID_PACKAGE_PRICE = 50  # INR 50 for 10 links
 
 BASE_URL = "http://localhost:5001"
 
@@ -34,7 +37,14 @@ def load_user(user_id):
     from db import get_user_by_id
     user_data = get_user_by_id(user_id)
     if user_data:
-        return User(user_data[0], user_data[1], user_data[2], user_data[3], user_data[4])
+        return User(
+            user_data[0],  # id
+            user_data[1],  # google_id
+            user_data[2],  # email
+            user_data[3],  # name
+            user_data[4],  # picture
+            user_data[5] if len(user_data) > 5 else 10       # urls_remaining
+        )
     return None
 
 init_db()
@@ -100,10 +110,16 @@ def index():
     remaining_usage = get_remaining_guest_usage()
     
     if request.method == 'POST':
-        # Check guest usage limit
-        if not check_guest_usage_limit():
-            flash(f'Guest usage limit reached! You can only shorten {GUEST_USAGE_LIMIT} URLs per day. Please sign in for unlimited access.', 'error')
-            return render_template('index.html', remaining_usage=0, show_limit_reached=True)
+        # Check limits based on user type
+        if current_user.is_authenticated:
+            if current_user.urls_remaining <= 0:
+                flash(f'You have used all your available links! Purchase more links to continue.', 'error')
+                return redirect(url_for('pricing'))
+        else:
+            # Guest user check
+            if not check_guest_usage_limit():
+                flash(f'Guest usage limit reached! You can only shorten {GUEST_USAGE_LIMIT} URLs per day. Please sign in for more access.', 'error')
+                return render_template('index.html', remaining_usage=0, show_limit_reached=True)
         
         long_url = request.form['long_url']
         short_code = generate_short_code()
@@ -113,8 +129,15 @@ def index():
         user_id = current_user.id if current_user.is_authenticated else None
         save_to_db(long_url, short_code, user_id)
 
-        # Record usage for guest users
-        record_guest_usage()
+        # Update usage tracking
+        if current_user.is_authenticated:
+            # Decrease user's remaining links
+            new_remaining = current_user.urls_remaining - 1
+            update_user_urls_remaining(current_user.id, new_remaining)
+            current_user.urls_remaining = new_remaining
+        else:
+            # Record usage for guest users
+            record_guest_usage()
 
         qr_code_path = generate_qr(short_url)
         visits = get_visits(short_code)
@@ -126,7 +149,10 @@ def index():
                                remaining_usage=get_remaining_guest_usage())
     
     # GET request
-    return render_template('index.html', remaining_usage=remaining_usage)
+    user_remaining = current_user.urls_remaining if current_user.is_authenticated else None
+    return render_template('index.html', 
+                         remaining_usage=remaining_usage, 
+                         user_remaining=user_remaining)
 
 
 
@@ -162,11 +188,18 @@ def google_auth():
         
         if user_data:
             # User exists, log them in
-            user = User(user_data[0], user_data[1], user_data[2], user_data[3], user_data[4])
+            user = User(
+                user_data[0],  # id
+                user_data[1],  # google_id
+                user_data[2],  # email
+                user_data[3],  # name
+                user_data[4],  # picture
+                user_data[5] if len(user_data) > 5 else 10       # urls_remaining
+            )
         else:
             # Create new user
             user_id = create_user(google_id, email, name, picture)
-            user = User(user_id, google_id, email, name, picture)
+            user = User(user_id, google_id, email, name, picture, 10)  # 10 free links for new users
         
         login_user(user)
         return {'success': True}
@@ -179,11 +212,33 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    user_urls = get_user_urls(current_user.id)
-    return render_template('dashboard.html', urls=user_urls)
+@app.route('/test-login')
+def test_login():
+    """Test login route for development - bypasses OAuth"""
+    # Create or get test user
+    test_google_id = "test_user_123"
+    test_email = "test@example.com"
+    test_name = "Test User"
+    test_picture = "https://via.placeholder.com/50"
+    
+    # Check if test user exists
+    user_data = get_user_by_google_id(test_google_id)
+    if user_data:
+        user = User(
+            user_data[0],  # id
+            user_data[1],  # google_id
+            user_data[2],  # email
+            user_data[3],  # name
+            user_data[4],  # picture
+            user_data[5] if len(user_data) > 5 else 10       # urls_remaining
+        )
+    else:
+        # Create test user
+        user_id = create_user(test_google_id, test_email, test_name, test_picture)
+        user = User(user_id, test_google_id, test_email, test_name, test_picture, 10)
+    
+    login_user(user)
+    return redirect(url_for('index'))
 
 @app.route('/api/usage-status')
 def usage_status():
@@ -193,6 +248,39 @@ def usage_status():
         'limit': GUEST_USAGE_LIMIT,
         'is_authenticated': current_user.is_authenticated
     })
+
+@app.route('/buy-links', methods=['POST'])
+@login_required
+def buy_links():
+    """Simple payment endpoint - adds 10 links for ₹50"""
+    try:
+        # In a real app, this would integrate with a payment gateway
+        # For now, we'll just add the links (assuming payment was successful)
+        add_paid_links(current_user.id)
+        
+        # Update the current user's remaining links
+        current_user.urls_remaining += 10
+        
+        return jsonify({
+            'success': True,
+            'message': 'Successfully purchased 10 additional links!',
+            'new_remaining': current_user.urls_remaining
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Payment processing failed. Please try again.'
+        }), 500
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """User dashboard showing stats and purchase options"""
+    user_urls = get_user_urls(current_user.id)
+    return render_template('dashboard.html', 
+                         user=current_user,
+                         user_urls=user_urls,
+                         urls_remaining=current_user.urls_remaining)
 
 
 if __name__ == "__main__":
