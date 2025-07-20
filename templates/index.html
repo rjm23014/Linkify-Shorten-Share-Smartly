@@ -9,8 +9,11 @@
 </head>
 
 <body>
+    {% include 'navbar.html' %}
+    
     <div class="container">
         <h1>🔗 Linkify</h1>
+        <p>Shorten your links and share them smartly</p>
         <form method="POST">
             <input type="url" name="long_url" placeholder="Enter a long URL" required autofocus>
             <button type="submit">Shorten & Generate QR</button>
