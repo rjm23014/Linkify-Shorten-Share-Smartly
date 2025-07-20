@@ -13,6 +13,15 @@
 - 📱 **Mobile Responsive** - Works perfectly on all devices
 - 🌙 **Dark Mode Support** - Automatic theme adaptation
 
+## 📸 Demo Screenshots
+
+Check out the [demo folder](./demo/) for application screenshots showcasing:
+- 🏠 **Homepage** - Modern URL shortening interface
+- 🔗 **Results Page** - Shortened URLs with QR codes  
+- 🔐 **Login System** - Google OAuth integration
+- 📊 **Dashboard** - Analytics and link management
+- 💎 **Premium Features** - Link purchase system
+
 ## 🚀 Live Demo
 
 Visit the live application: **[linkify-url-shortener.onrender.com](https://linkify-url-shortener.onrender.com)**
