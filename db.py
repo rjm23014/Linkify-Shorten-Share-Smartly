@@ -54,3 +54,10 @@ def get_visits(short_code):
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else 0
+
+def save_to_db(long_url, short_code):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO urls (long_url, short_code) VALUES (?, ?)', (long_url, short_code))
+    conn.commit()
+    conn.close()
