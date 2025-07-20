@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Linkify</title>
+    <title>Sign In - Linkify</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="https://img.icons8.com/ios-filled/50/link.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,33 +12,57 @@
 <body>
     {% include 'navbar.html' %}
     
-    <div class="container">
-        <h1>🔐 Sign In to Linkify</h1>
-        <p>Sign in to track your shortened URLs and access advanced features</p>
-        
-        <div class="login-section">
-            <div id="g_id_onload"
-                 data-client_id="{{ google_client_id }}"
-                 data-callback="handleCredentialResponse">
+    <main class="main-content">
+        <div class="container login-container">
+            <div class="login-header">
+                <h1>🔐 Welcome to Linkify</h1>
+                <p class="login-subtitle">Sign in to track your shortened URLs, view analytics, and access premium features.</p>
             </div>
-            <div class="g_id_signin" 
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="filled_blue"
-                 data-text="sign_in_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left">
+            
+            <div class="google-signin-container">
+                <div id="g_id_onload"
+                     data-client_id="{{ google_client_id }}"
+                     data-callback="handleCredentialResponse">
+                </div>
+                <div class="g_id_signin" 
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="pill"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+            
+            <div class="divider">or</div>
+            
+            <div class="guest-section">
+                <h3>Continue as Guest</h3>
+                <p>You can still use Linkify without signing in, but you won't be able to track your URLs.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <span>👤</span>
+                    Continue as Guest
+                </a>
+            </div>
+            
+            <div class="features-info">
+                <h3>Why Sign In?</h3>
+                <ul class="benefits-list">
+                    <li>📊 Track your URL analytics</li>
+                    <li>📱 Access your links from any device</li>
+                    <li>🎨 Customize your short links</li>
+                    <li>📈 View detailed statistics</li>
+                </ul>
             </div>
         </div>
-        
-        <div class="guest-section">
-            <p>Or continue as guest</p>
-            <a href="{{ url_for('index') }}" class="guest-btn">Continue as Guest</a>
-        </div>
-    </div>
+    </main>
 
     <script>
         function handleCredentialResponse(response) {
+            // Show loading state
+            const container = document.querySelector('.google-signin-container');
+            container.classList.add('loading');
+            
             fetch('/auth/google', {
                 method: 'POST',
                 headers: {
@@ -51,12 +75,14 @@
                 if (data.success) {
                     window.location.href = '/';
                 } else {
-                    alert('Login failed. Please try again.');
+                    container.classList.remove('loading');
+                    alert('Sign in failed. Please try again.');
                 }
             })
             .catch(error => {
+                container.classList.remove('loading');
                 console.error('Error:', error);
-                alert('Login failed. Please try again.');
+                alert('Sign in failed. Please try again.');
             });
         }
     </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Linkify</title>
+    <title>URL Shortened - Linkify</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="https://img.icons8.com/ios-filled/50/link.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,16 +11,61 @@
 <body>
     {% include 'navbar.html' %}
     
-    <div class="container">
-        <h2>Your Short URL:</h2>
-        <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
-        <a onclick="navigator.clipboard.writeText('{{ short_url }}'); alert('Copied!')">📋 Copy Link</a>
+    <main class="main-content">
+        <div class="container">
+            <h2>🎉 Your Short URL is Ready!</h2>
+            
+            <div class="result-container">
+                <div class="short-url-display">
+                    <a href="{{ short_url }}" target="_blank" class="short-url-link">{{ short_url }}</a>
+                    <button class="copy-button" onclick="copyToClipboard('{{ short_url }}')">
+                        📋 Copy
+                    </button>
+                </div>
+                
+                <div class="qr-code-container">
+                    <h3>📱 QR Code</h3>
+                    <img src="/{{ qr_image }}" alt="QR Code for {{ short_url }}" class="qr-code-image">
+                    <p class="qr-info">Scan with your phone camera to open the link</p>
+                </div>
+                
+                <div class="stats-display">
+                    📊 Total Visits: <strong>{{ visits }}</strong>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="/" class="btn btn-secondary">
+                    <span>🔙</span>
+                    Shorten Another URL
+                </a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn">
+                    <span>📊</span>
+                    View Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
 
-        <h3>QR Code:</h3>
-        <img src="/{{ qr_image }}" alt="QR Code" width="200">
-        <p>📊 Total Visits: <strong>{{ visits }}</strong></p>
-        <br>
-        <a href="/">🔙 Shorten another</a>
-    </div>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = 'var(--accent-color)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 2000);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
 </body>
 </html>

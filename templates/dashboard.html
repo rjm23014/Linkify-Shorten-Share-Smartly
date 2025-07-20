@@ -11,59 +11,89 @@
 <body>
     {% include 'navbar.html' %}
     
-    <div class="container">
-        <h1>📊 Your Dashboard</h1>
-        <p>Welcome back, {{ current_user.name }}!</p>
-        
-        <div class="dashboard-stats">
-            <div class="stat-card">
-                <h3>Total URLs</h3>
-                <p class="stat-number">{{ urls|length }}</p>
+    <main class="main-content">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>📊 Your Dashboard</h1>
+                <p class="welcome-message">Welcome back, <strong>{{ current_user.name }}</strong>!</p>
             </div>
-            <div class="stat-card">
-                <h3>Total Visits</h3>
-                <p class="stat-number">{{ urls|sum(attribute=3) or 0 }}</p>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total URLs</div>
+                    <div class="stat-number">{{ urls|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Visits</div>
+                    <div class="stat-number">{{ urls|sum(attribute=3) or 0 }}</div>
+                </div>
             </div>
-        </div>
 
-        <div class="urls-section">
-            <h2>Your Shortened URLs</h2>
-            {% if urls %}
-                <div class="urls-list">
-                    {% for url in urls %}
-                    <div class="url-item">
-                        <div class="url-info">
-                            <h3>{{ url[1][:50] }}{% if url[1]|length > 50 %}...{% endif %}</h3>
-                            <p class="short-url">
+            <div class="urls-section">
+                <h2 class="section-title">Your Shortened URLs</h2>
+                
+                {% if urls %}
+                    <div class="urls-grid">
+                        {% for url in urls %}
+                        <div class="url-card">
+                            <div class="url-title">
+                                {{ url[1][:80] }}{% if url[1]|length > 80 %}...{% endif %}
+                            </div>
+                            
+                            <div class="url-short">
                                 <a href="{{ request.url_root }}{{ url[2] }}" target="_blank">
                                     {{ request.url_root }}{{ url[2] }}
                                 </a>
-                            </p>
-                            <p class="url-stats">
-                                📊 {{ url[3] }} visits • 📅 {{ url[5] }}
-                            </p>
+                            </div>
+                            
+                            <div class="url-meta">
+                                <span>📊 {{ url[3] }} visits</span>
+                                <span>📅 {{ url[5] if url[5] else 'Unknown date' }}</span>
+                            </div>
+                            
+                            <div class="url-actions">
+                                <button onclick="copyToClipboard('{{ request.url_root }}{{ url[2] }}')" class="btn btn-secondary">
+                                    📋 Copy Link
+                                </button>
+                                <a href="{{ request.url_root }}{{ url[2] }}" target="_blank" class="btn">
+                                    🔗 Visit
+                                </a>
+                            </div>
                         </div>
-                        <div class="url-actions">
-                            <button onclick="copyToClipboard('{{ request.url_root }}{{ url[2] }}')" class="copy-btn">📋 Copy</button>
-                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-urls">
-                    <p>You haven't shortened any URLs yet.</p>
-                    <a href="{{ url_for('index') }}" class="create-first-btn">Create Your First Short URL</a>
-                </div>
-            {% endif %}
+                {% else %}
+                    <div class="no-urls">
+                        <div class="no-urls-icon">🔗</div>
+                        <h3>No URLs Yet</h3>
+                        <p>You haven't shortened any URLs yet. Create your first one!</p>
+                        <a href="{{ url_for('index') }}" class="btn" style="margin-top: 1.5rem;">
+                            <span>✨</span>
+                            Create Your First Short URL
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
-                alert('URL copied to clipboard!');
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-secondary');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-secondary');
+                }, 2000);
             }, function(err) {
                 console.error('Could not copy text: ', err);
+                alert('Failed to copy. Please select and copy manually.');
             });
         }
     </script>

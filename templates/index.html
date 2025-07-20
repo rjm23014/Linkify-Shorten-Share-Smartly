@@ -2,22 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Linkify</title>
+    <title>Linkify - Modern URL Shortener</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="https://img.icons8.com/ios-filled/50/link.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Shorten your URLs with style. Modern, fast, and secure URL shortener with QR code generation.">
 </head>
 
 <body>
     {% include 'navbar.html' %}
     
-    <div class="container">
-        <h1>🔗 Linkify</h1>
-        <p>Shorten your links and share them smartly</p>
-        <form method="POST">
-            <input type="url" name="long_url" placeholder="Enter a long URL" required autofocus>
-            <button type="submit">Shorten & Generate QR</button>
-        </form>
-    </div>
+    <main class="main-content">
+        <div class="container">
+            <h1>🔗 Linkify</h1>
+            <p>Transform long URLs into elegant short links that are easy to share and remember.</p>
+            
+            <form method="POST" class="url-form">
+                <div class="form-group">
+                    <input type="url" 
+                           name="long_url" 
+                           placeholder="https://example.com/very-long-url-that-needs-shortening" 
+                           required 
+                           autofocus
+                           autocomplete="url">
+                </div>
+                <button type="submit" class="btn">
+                    <span>✨</span>
+                    Shorten & Generate QR
+                </button>
+            </form>
+            
+            <div class="features-preview">
+                <div class="feature">
+                    <span class="feature-icon">⚡</span>
+                    <span>Instant</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📱</span>
+                    <span>QR Codes</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📊</span>
+                    <span>Analytics</span>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
